@@ -13,9 +13,4 @@ public class FileSystemXmlApplicationContext extends AbstractApplicationContext 
     protected Resource getResourceByPath(String configFile) {
         return new FileSystemResource(configFile);
     }
-
-    @Override
-    public Object getBean(String beanID) {
-        return factory.getBean(beanID);
-    }
 }
