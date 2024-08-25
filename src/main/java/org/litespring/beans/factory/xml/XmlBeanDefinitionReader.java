@@ -32,7 +32,6 @@ public class XmlBeanDefinitionReader {
     public void loadBeanDefinition(Resource resource) {
         InputStream is = null;
         try {
-            ClassLoader cl = ClassUtils.getDefaultClassLoader();
             is = resource.getInputStream();
             SAXReader reader = new SAXReader();
             Document doc = reader.read(is);

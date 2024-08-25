@@ -39,6 +39,21 @@ public class BeanFactoryTest {
     }
 
     @Test
+    public void testGetBeanOfPrototype() {
+        reader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
+        BeanDefinition bd = factory.getBeanDefinition("petStorePrototype");
+        assertFalse(bd.isSingleton());
+        assertTrue(bd.isPrototype());
+        assertEquals("org.litespring.service.v1.PetStoreService", bd.getBeanClassName());
+
+        PetStoreService petStore = (PetStoreService)factory.getBean("petStorePrototype");
+        assertNotNull(petStore);
+        PetStoreService petStore1 = (PetStoreService)factory.getBean("petStorePrototype");
+
+        assertFalse(petStore.equals(petStore1));
+    }
+
+    @Test
     public void testInvalidBean() {
         reader.loadBeanDefinition(new ClassPathResource("petstore-v1.xml"));
         try {
