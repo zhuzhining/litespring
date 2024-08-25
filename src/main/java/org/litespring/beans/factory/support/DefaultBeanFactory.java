@@ -2,18 +2,18 @@ package org.litespring.beans.factory.support;
 
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.factory.BeanCreationException;
-import org.litespring.beans.factory.BeanFactory;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.util.ClassUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory, BeanDefinitionRegistry {
 
     private ClassLoader classLoader;
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
+
 
     @Override
     public BeanDefinition getBeanDefinition(String beanID) {
@@ -31,7 +31,18 @@ public class DefaultBeanFactory implements ConfigurableBeanFactory, BeanDefiniti
         if (bd == null) {
             throw new BeanCreationException("bean定义不存在");
         }
+        if (bd.isSingleton()) {
+            Object bean = this.getSingleton(beanID);
+            if (bean == null) {
+                bean = createBean(bd);
+                this.registrySingleton(beanID, bean);
+            }
+            return bean;
+        }
+        return createBean(bd);
+    }
 
+    private Object createBean(BeanDefinition bd) {
         ClassLoader cl = this.getClassLoader();
         Class<?> cls;
         try {
