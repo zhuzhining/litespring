@@ -8,6 +8,7 @@ import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.factory.BeanDefinitionStoreException;
 import org.litespring.beans.factory.support.BeanDefinitionRegistry;
 import org.litespring.beans.factory.support.GenericBeanDefinition;
+import org.litespring.core.io.Resource;
 import org.litespring.util.ClassUtils;
 
 import java.io.IOException;
@@ -26,11 +27,11 @@ public class XmlBeanDefinitionReader {
         this.registry = registry;
     }
 
-    public void loadBeanDefinition(String configFile) {
+    public void loadBeanDefinition(Resource resource) {
         InputStream is = null;
         try {
             ClassLoader cl = ClassUtils.getDefaultClassLoader();
-            is = cl.getResourceAsStream(configFile);
+            is = resource.getInputStream();
             SAXReader reader = new SAXReader();
             Document doc = reader.read(is);
             Element root = doc.getRootElement();
@@ -42,7 +43,7 @@ public class XmlBeanDefinitionReader {
                 BeanDefinition bd = new GenericBeanDefinition(id, className);
                 this.registry.registryBeanDefinition(id, bd);
             }
-        } catch (DocumentException e) {
+        } catch (DocumentException | IOException e) {
             throw new BeanDefinitionStoreException("获取对应xml文件失败", e);
         } finally {
             if (is != null) {

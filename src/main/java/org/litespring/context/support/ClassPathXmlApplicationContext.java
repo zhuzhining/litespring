@@ -1,0 +1,21 @@
+package org.litespring.context.support;
+
+import org.litespring.core.io.ClassPathResource;
+import org.litespring.core.io.Resource;
+
+public class ClassPathXmlApplicationContext extends AbstractApplicationContext {
+
+    public ClassPathXmlApplicationContext(String configFile) {
+        super(configFile);
+    }
+
+    @Override
+    protected Resource getResourceByPath(String configFile) {
+        return new ClassPathResource(configFile);
+    }
+
+    @Override
+    public Object getBean(String beanID) {
+        return factory.getBean(beanID);
+    }
+}
