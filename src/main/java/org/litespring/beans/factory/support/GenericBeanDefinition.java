@@ -1,12 +1,18 @@
 package org.litespring.beans.factory.support;
 
 import org.litespring.beans.BeanDefinition;
+import org.litespring.beans.PropertyValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GenericBeanDefinition implements BeanDefinition {
 
     private String id;
 
     private String className;
+
+    private List<PropertyValue> properties = new ArrayList<>();
 
     private boolean singleton = true;
 
@@ -17,6 +23,11 @@ public class GenericBeanDefinition implements BeanDefinition {
     public GenericBeanDefinition(String id, String className) {
         this.id = id;
         this.className = className;
+    }
+
+    @Override
+    public List<PropertyValue> getPropertyValues() {
+        return this.properties;
     }
 
     @Override
