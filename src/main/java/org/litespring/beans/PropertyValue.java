@@ -6,8 +6,6 @@ public class PropertyValue {
 
     private Object value;
 
-    private Object convertedValue;
-
     public PropertyValue(String name, Object value) {
         this.name = name;
         this.value = value;
@@ -19,9 +17,5 @@ public class PropertyValue {
 
     public Object getValue() {
         return value;
-    }
-
-    public Object getConvertedValue() {
-        return this.convertedValue;
     }
 }
