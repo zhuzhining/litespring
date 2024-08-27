@@ -9,6 +9,7 @@
         <property name="accountDao" ref="accountDao"></property>
         <property name="itemDao" ref="itemDao"></property>
         <property name="name" value="zzn"></property>
+        <property name="version" value="6"></property>
     </bean>
 
     <bean id="accountDao" class="org.litespring.dao.v2.AccountDao"></bean>

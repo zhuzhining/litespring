@@ -8,5 +8,5 @@ import org.junit.runners.Suite;
         ApplicationContextTest.class,
         BeanFactoryTest.class,
         ResourceTest.class})
-public class V1AllTest {
+public class V1AllTests {
 }

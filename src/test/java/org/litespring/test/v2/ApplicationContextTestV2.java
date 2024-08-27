@@ -23,5 +23,6 @@ public class ApplicationContextTestV2 {
         assertTrue(petstore.getAccountDao() instanceof AccountDao);
         assertTrue(petstore.getItemDao() instanceof ItemDao);
         assertTrue("zzn".equals(petstore.getName()));
+        assertTrue(petstore.getVersion() == 6);
     }
 }

@@ -21,7 +21,7 @@ public class BeanDefinitionTest {
 
         BeanDefinition bd = factory.getBeanDefinition("petStore");
 
-        assertTrue(bd.getPropertyValues().size() == 2);
+        assertTrue(bd.getPropertyValues().size() == 4);
 
         {
             PropertyValue pv = this.getPropertyValueByName(bd, "accountDao");
