@@ -33,7 +33,8 @@ public class ResourceTest {
 
     @Test
     public void testFileSystemResource() throws IOException {
-        Resource resource = new FileSystemResource("D:\\project\\litespring\\src\\test\\resources\\petstore-v1.xml");
+
+        Resource resource = new FileSystemResource("src\\test\\resources\\petstore-v1.xml");
         InputStream is = null;
 
         try {

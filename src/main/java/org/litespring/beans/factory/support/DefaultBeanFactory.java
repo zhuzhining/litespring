@@ -1,5 +1,6 @@
 package org.litespring.beans.factory.support;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.SimpleTypeConverter;
@@ -8,10 +9,8 @@ import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.util.ClassUtils;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +53,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         //创建实例
         Object bean = initializationBean(bd);
         //设置属性
-        populateBean(bd, bean);
+        populateBeanUseCommonBeanUtils(bd, bean);
 
         return bean;
     }
@@ -93,6 +92,25 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
                         break;
                     }
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BeanCreationException("bean填充属性失败", e);
+        }
+    }
+
+    private void populateBeanUseCommonBeanUtils(BeanDefinition bd, Object bean) {
+        List<PropertyValue> propertyValues = bd.getPropertyValues();
+        if (propertyValues == null || propertyValues.size() == 0) {
+            return;
+        }
+        BeanDefinitionValueResolver resolver = new BeanDefinitionValueResolver(this);
+        try {
+            for (PropertyValue pv : propertyValues) {
+                String name = pv.getName();
+                Object originalValue = pv.getValue();
+                Object resolveValue = resolver.resolveValueIfNecessary(originalValue);
+                BeanUtils.setProperty(bean, name, resolveValue);
             }
         } catch (Exception e) {
             e.printStackTrace();
