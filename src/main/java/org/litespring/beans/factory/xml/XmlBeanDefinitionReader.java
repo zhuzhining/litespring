@@ -5,6 +5,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.litespring.beans.BeanDefinition;
+import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
 import org.litespring.beans.factory.BeanDefinitionStoreException;
 import org.litespring.beans.factory.config.RuntimeBeanReference;
@@ -12,6 +13,7 @@ import org.litespring.beans.factory.config.TypedStringValue;
 import org.litespring.beans.factory.support.BeanDefinitionRegistry;
 import org.litespring.beans.factory.support.GenericBeanDefinition;
 import org.litespring.core.io.Resource;
+import org.litespring.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +29,11 @@ public class XmlBeanDefinitionReader {
 
     public static final String PROPERTY_ELEMENT = "property";
 
+    public static final String CONSTRUCTOR_ELEMENT = "Constructor-arg";
+
     public static final String NAME_ATTRIBUTE = "name";
+
+    public static final String TYPE_ATTRIBUTE = "type";
 
     public static final String REF_ATTRIBUTE = "ref";
 
@@ -57,6 +63,7 @@ public class XmlBeanDefinitionReader {
                     bd.setScope(scope);
                 }
                 parserPropertyValues(element, bd);
+                parserConstructorArgElements(element, bd);
                 this.registry.registryBeanDefinition(id, bd);
             }
         } catch (DocumentException | IOException e) {
@@ -70,6 +77,28 @@ public class XmlBeanDefinitionReader {
                 }
             }
         }
+    }
+
+    private void parserConstructorArgElements(Element parent, BeanDefinition bd) {
+        Iterator iterator = parent.elementIterator(CONSTRUCTOR_ELEMENT);
+        while (iterator.hasNext()) {
+            Element element = (Element) iterator.next();
+            parserConstructorArgElement(bd, element);
+        }
+    }
+
+    private void parserConstructorArgElement(BeanDefinition bd, Element element) {
+        String name = element.attributeValue(NAME_ATTRIBUTE);
+        String type = element.attributeValue(TYPE_ATTRIBUTE);
+        Object value = this.parserPropertyValue(element);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if (StringUtils.hasText(name)) {
+            valueHolder.setName(name);
+        }
+        if (StringUtils.hasText(type)) {
+            valueHolder.setName(type);
+        }
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     private void parserPropertyValues(Element parent, BeanDefinition bd) {

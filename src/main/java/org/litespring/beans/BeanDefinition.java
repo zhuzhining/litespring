@@ -19,4 +19,6 @@ public interface BeanDefinition {
     void setScope(String scope);
 
     List<PropertyValue> getPropertyValues();
+
+    ConstructorArgument getConstructorArgument();
 }

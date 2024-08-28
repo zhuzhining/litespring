@@ -1,9 +1,7 @@
 package org.litespring.beans.factory.support;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.litespring.beans.BeanDefinition;
-import org.litespring.beans.PropertyValue;
-import org.litespring.beans.SimpleTypeConverter;
+import org.litespring.beans.*;
 import org.litespring.beans.factory.BeanCreationException;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.util.ClassUtils;
@@ -59,15 +57,19 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     private Object initializationBean(BeanDefinition bd) {
-        ClassLoader cl = this.getClassLoader();
-        Class<?> cls;
-        try {
-            cls = cl.loadClass(bd.getBeanClassName());
-            return cls.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BeanCreationException("实例化bean失败", e);
+        if (!bd.getConstructorArgument().isEmpty()) {
+            ConstructorResolver resolver = new ConstructorResolver(this);
+            return resolver.autowireConstructor(bd);
+        } else {
+            ClassLoader cl = this.getClassLoader();
+            try {
+                return cl.loadClass(bd.getBeanClassName()).newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BeanCreationException("实例化bean失败", e);
+            }
         }
+
     }
 
 
