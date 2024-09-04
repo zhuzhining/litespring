@@ -13,6 +13,8 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     private String className;
 
+    private Class beanClass;
+
     private List<PropertyValue> properties = new ArrayList<>();
 
     private ConstructorArgument constructorArgument = new ConstructorArgument();
@@ -26,6 +28,9 @@ public class GenericBeanDefinition implements BeanDefinition {
     public GenericBeanDefinition(String id, String className) {
         this.id = id;
         this.className = className;
+    }
+
+    public GenericBeanDefinition() {
     }
 
     @Override
@@ -62,5 +67,37 @@ public class GenericBeanDefinition implements BeanDefinition {
         this.scope = scope;
         this.singleton = SCOPE_SINGLETON.equals(scope) || SCOPE_DEFAULT.equals(scope);
         this.protoType = SCOPE_PROTOTYPE.equals(scope);
+    }
+
+    public void setId(String beanID) {
+        this.id = beanID;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
+    }
+
+    @Override
+    public Class getBeanClass() {
+        if (!hasBeanClass()) {
+            throw new RuntimeException("请先调用【resolveBeanClass】方法解析beanClass");
+        }
+        return this.beanClass;
+    }
+
+    @Override
+    public void resolveBeanClass(ClassLoader loader) throws ClassNotFoundException {
+        if (!this.hasBeanClass()) {
+            this.beanClass = loader.loadClass(this.className);
+        }
+    }
+
+    protected void setBeanClassName(String className) {
+        this.className = className;
     }
 }

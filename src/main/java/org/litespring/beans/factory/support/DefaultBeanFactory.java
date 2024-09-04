@@ -4,6 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.litespring.beans.*;
 import org.litespring.beans.factory.BeanCreationException;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
+import org.litespring.beans.factory.config.DependencyDescriptor;
 import org.litespring.util.ClassUtils;
 
 import java.beans.BeanInfo;
@@ -128,5 +129,21 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     @Override
     public ClassLoader getClassLoader() {
         return this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader();
+    }
+
+    @Override
+    public Object resolveDependency(DependencyDescriptor descriptor) {
+        Class fieldType = descriptor.getDependencyType();
+        for (BeanDefinition bd : this.beanDefinitionMap.values()) {
+            try {
+                bd.resolveBeanClass(this.getClassLoader());
+                if (bd.getBeanClass().isAssignableFrom(fieldType)) {
+                    return this.getBean(bd.getId());
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

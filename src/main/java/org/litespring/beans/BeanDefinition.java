@@ -21,4 +21,12 @@ public interface BeanDefinition {
     List<PropertyValue> getPropertyValues();
 
     ConstructorArgument getConstructorArgument();
+
+    String getId();
+
+    boolean hasBeanClass();
+
+    Class getBeanClass();
+
+    void resolveBeanClass(ClassLoader loader) throws ClassNotFoundException;
 }

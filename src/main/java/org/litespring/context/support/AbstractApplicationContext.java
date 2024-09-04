@@ -10,8 +10,6 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     private DefaultBeanFactory factory;
 
-    private ClassLoader classLoader;
-
     public AbstractApplicationContext(String configFile) {
         factory = new DefaultBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
@@ -25,14 +23,4 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     protected abstract Resource getResourceByPath(String configFile);
-
-    @Override
-    public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader();
-    }
 }
