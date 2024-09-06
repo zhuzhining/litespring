@@ -1,5 +1,7 @@
 package org.litespring.context.support;
 
+import org.litespring.beans.factory.annotation.AutowiredAnnotationProcessor;
+import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.beans.factory.support.DefaultBeanFactory;
 import org.litespring.beans.factory.xml.XmlBeanDefinitionReader;
 import org.litespring.context.ApplicationContext;
@@ -15,6 +17,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         Resource resource = this.getResourceByPath(configFile);
         reader.loadBeanDefinition(resource);
+        registryBeanPostProcessor(factory);
     }
 
     @Override
@@ -23,4 +26,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     }
 
     protected abstract Resource getResourceByPath(String configFile);
+
+    protected void registryBeanPostProcessor(ConfigurableBeanFactory factory) {
+        AutowiredAnnotationProcessor processor = new AutowiredAnnotationProcessor();
+        processor.setBeanFactory(factory);
+        factory.addBeanPostProcessor(processor);
+    }
 }

@@ -1,6 +1,8 @@
 package org.litespring.beans.factory.annotation;
 
+import org.litespring.beans.BeansException;
 import org.litespring.beans.factory.config.AutowireCapableBeanFactory;
+import org.litespring.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.litespring.core.annotation.AnnotationUtils;
 import org.litespring.util.ReflectionUtils;
 
@@ -13,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class AutowiredAnnotationProcessor {
+public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostProcessor {
     private AutowireCapableBeanFactory factory;
 
     private Set<Class<? extends Annotation>> autowiredAnnotationTypes = new HashSet<>();
@@ -76,5 +78,36 @@ public class AutowiredAnnotationProcessor {
 
     public void setBeanFactory(AutowireCapableBeanFactory factory) {
         this.factory = factory;
+    }
+
+    @Override
+    public Object beforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object afterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object beforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        return null;
+    }
+
+    @Override
+    public boolean afterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    @Override
+    public Object postProcessPropertyValues(Object bean, String beanName) throws BeansException {
+        InjectionMetadata metadata = buildAutowiringMetadata(bean.getClass());
+        try {
+            metadata.inject(bean);
+        } catch (Exception e) {
+            throw new BeansException("bean属性注入异常", e);
+        }
+        return null;
     }
 }

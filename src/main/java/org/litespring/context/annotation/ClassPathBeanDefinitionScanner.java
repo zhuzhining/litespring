@@ -1,6 +1,5 @@
 package org.litespring.context.annotation;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.factory.support.BeanDefinitionRegistry;
 import org.litespring.beans.factory.support.BeanNameGenerator;
@@ -35,7 +34,6 @@ public class ClassPathBeanDefinitionScanner {
                 this.registry.registryBeanDefinition(candidate.getId(), candidate);
             }
         }
-
     }
 
     private Set<BeanDefinition> findCandidateComponents(String basePackage) {

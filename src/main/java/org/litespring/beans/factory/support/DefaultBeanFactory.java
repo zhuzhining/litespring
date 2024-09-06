@@ -1,15 +1,21 @@
 package org.litespring.beans.factory.support;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.litespring.beans.*;
+import org.litespring.beans.BeanDefinition;
+import org.litespring.beans.PropertyValue;
+import org.litespring.beans.SimpleTypeConverter;
 import org.litespring.beans.factory.BeanCreationException;
+import org.litespring.beans.factory.annotation.AutowiredAnnotationProcessor;
+import org.litespring.beans.factory.config.BeanPostProcessor;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 import org.litespring.beans.factory.config.DependencyDescriptor;
+import org.litespring.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.litespring.util.ClassUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +25,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     private ClassLoader classLoader;
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
+
+    private List<BeanPostProcessor> postProcessors = new ArrayList<>();
 
 
     @Override
@@ -103,6 +111,13 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     private void populateBeanUseCommonBeanUtils(BeanDefinition bd, Object bean) {
+
+        for (BeanPostProcessor beanPostProcessor : this.getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                ((InstantiationAwareBeanPostProcessor)beanPostProcessor).postProcessPropertyValues(bean, bd.getId());
+            }
+        }
+
         List<PropertyValue> propertyValues = bd.getPropertyValues();
         if (propertyValues == null || propertyValues.size() == 0) {
             return;
@@ -129,6 +144,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     @Override
     public ClassLoader getClassLoader() {
         return this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader();
+    }
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.postProcessors.add(postProcessor);
+    }
+
+    @Override
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.postProcessors;
     }
 
     @Override
