@@ -3,10 +3,7 @@ package org.litespring.aop.aspectj;
 import org.litespring.aop.Advice;
 import org.litespring.aop.MethodMatcher;
 import org.litespring.aop.Pointcut;
-import org.litespring.aop.framework.AopConfig;
-import org.litespring.aop.framework.AopConfigSupport;
-import org.litespring.aop.framework.AopProxyFactory;
-import org.litespring.aop.framework.CglibProxyFactory;
+import org.litespring.aop.framework.*;
 import org.litespring.beans.BeansException;
 import org.litespring.beans.factory.config.BeanPostProcessor;
 import org.litespring.beans.factory.config.ConfigurableBeanFactory;
@@ -54,6 +51,7 @@ public class AspectJAutoProxyCreator implements BeanPostProcessor {
 
         } else {
             //TODO 使用JDK动态代理
+            factory = new JDKProxyFactory(config);
         }
 
         return factory.getProxy();
