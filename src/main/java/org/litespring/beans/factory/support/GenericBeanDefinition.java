@@ -11,7 +11,7 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     private String id;
 
-    private String className;
+    private String beaClassName;
 
     private Class beanClass;
 
@@ -23,14 +23,21 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     private boolean protoType = false;
 
+    private boolean isSynthetic = false;
+
     private String scope = SCOPE_DEFAULT;
 
     public GenericBeanDefinition(String id, String className) {
         this.id = id;
-        this.className = className;
+        this.beaClassName = className;
     }
 
     public GenericBeanDefinition() {
+    }
+
+    public GenericBeanDefinition(Class<?> cls) {
+        this.beanClass = cls;
+        this.beaClassName = cls.getName();
     }
 
     @Override
@@ -45,7 +52,7 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     @Override
     public String getBeanClassName() {
-        return this.className;
+        return this.beaClassName;
     }
 
     @Override
@@ -91,13 +98,22 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     @Override
+    public boolean isSynthetic() {
+        return this.isSynthetic;
+    }
+
+    public void setSynthetic(boolean synthetic) {
+        isSynthetic = synthetic;
+    }
+
+    @Override
     public void resolveBeanClass(ClassLoader loader) throws ClassNotFoundException {
         if (!this.hasBeanClass()) {
-            this.beanClass = loader.loadClass(this.className);
+            this.beanClass = loader.loadClass(this.beaClassName);
         }
     }
 
     protected void setBeanClassName(String className) {
-        this.className = className;
+        this.beaClassName = className;
     }
 }

@@ -6,7 +6,7 @@ public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory {
 
     void setClassLoader(ClassLoader classLoader);
 
-    ClassLoader getClassLoader();
+    ClassLoader getBeanClassLoader();
 
     void addBeanPostProcessor(BeanPostProcessor postProcessor);
 

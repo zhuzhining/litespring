@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.litespring.aop.config.ConfigBeanDefinitionParser;
 import org.litespring.beans.BeanDefinition;
 import org.litespring.beans.ConstructorArgument;
 import org.litespring.beans.PropertyValue;
@@ -43,6 +44,7 @@ public class XmlBeanDefinitionReader {
     public static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
     public static final String DEFAULT_NAMESPACE_URI = "http://www.springframework.org/schema/beans";
     public static final String CONTEXT_NAMESPACE_URI = "http://www.springframework.org/schema/context";
+    public static final String AOP_NAMESPACE_URI = "http://www.springframework.org/schema/aop";
 
     private BeanDefinitionRegistry registry;
 
@@ -60,11 +62,13 @@ public class XmlBeanDefinitionReader {
             Iterator iterator = root.elementIterator();
             while (iterator.hasNext()) {
                 Element element = (Element) iterator.next();
-                String namespaceURI = element.getNamespaceURI();
-                if(isDefaultNamespaceUri(namespaceURI)) {
+                String namespaceUri = element.getNamespaceURI();
+                if(isDefaultNamespace(namespaceUri)) {
                     parseDefaultElement(element);
-                } else if(isContextNamespaceUri(namespaceURI)) {
+                } else if(isContextNamespace(namespaceUri)) {
                     parseComponentElement(element);
+                } else if(isAOPNamespace(namespaceUri)) {
+                    parseAOPElement(element);
                 }
 
             }
@@ -80,6 +84,12 @@ public class XmlBeanDefinitionReader {
             }
         }
     }
+
+    private void parseAOPElement(Element element) {
+        ConfigBeanDefinitionParser parser = new ConfigBeanDefinitionParser();
+        parser.parse(element, this.registry);
+    }
+
 
     private void parseComponentElement(Element element) {
         String basePackages = element.attributeValue(BASE_PACKAGE_ATTRIBUTE);
@@ -97,16 +107,21 @@ public class XmlBeanDefinitionReader {
         }
         parserPropertyValues(element, bd);
         parserConstructorArgElements(element, bd);
-        this.registry.registryBeanDefinition(id, bd);
+        this.registry.registerBeanDefinition(id, bd);
     }
 
-    private boolean isDefaultNamespaceUri(String namespaceURI) {
-        return DEFAULT_NAMESPACE_URI.equals(namespaceURI);
+    private boolean isDefaultNamespace(String namespaceUri) {
+        return DEFAULT_NAMESPACE_URI.equals(namespaceUri);
     }
 
 
-    private boolean isContextNamespaceUri(String namespaceURI) {
-        return CONTEXT_NAMESPACE_URI.equals(namespaceURI);
+    private boolean isContextNamespace(String namespaceUri) {
+        return CONTEXT_NAMESPACE_URI.equals(namespaceUri);
+    }
+
+
+    private boolean isAOPNamespace(String namespaceUri) {
+        return AOP_NAMESPACE_URI.equals(namespaceUri);
     }
 
     private void parserConstructorArgElements(Element parent, BeanDefinition bd) {

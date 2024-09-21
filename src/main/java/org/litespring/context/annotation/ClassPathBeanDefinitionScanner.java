@@ -31,7 +31,7 @@ public class ClassPathBeanDefinitionScanner {
         for (String basePackage : basePackages) {
             Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
             for (BeanDefinition candidate : candidates) {
-                this.registry.registryBeanDefinition(candidate.getId(), candidate);
+                this.registry.registerBeanDefinition(candidate.getId(), candidate);
             }
         }
     }

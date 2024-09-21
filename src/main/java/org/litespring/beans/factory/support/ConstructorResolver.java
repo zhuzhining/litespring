@@ -2,58 +2,86 @@ package org.litespring.beans.factory.support;
 
 import org.litespring.beans.*;
 import org.litespring.beans.factory.BeanCreationException;
-import org.litespring.beans.factory.config.ConfigurableBeanFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 public class ConstructorResolver {
 
-    private ConfigurableBeanFactory factory;
+    private AbstractBeanFactory beanFactory;
 
-    public ConstructorResolver(ConfigurableBeanFactory factory) {
-        this.factory = factory;
+    public ConstructorResolver(AbstractBeanFactory factory) {
+        this.beanFactory = factory;
     }
 
     public Constructor findConstructor(BeanDefinition bd) {
         return null;
     }
 
-    public Object autowireConstructor(BeanDefinition bd) {
-        Class<?> cls;
+    public Object autowireConstructor(final BeanDefinition bd) {
+
+        Constructor<?> constructorToUse = null;
+        Object[] argsToUse = null;
+
+        Class<?> beanClass = null;
         try {
-            cls = this.factory.getClassLoader().loadClass(bd.getBeanClassName());
+            beanClass = this.beanFactory.getBeanClassLoader().loadClass(bd.getBeanClassName());
+
         } catch (ClassNotFoundException e) {
-            throw new BeanCreationException("加载bean的class异常：" + bd.getBeanClassName());
+            throw new BeanCreationException( bd.getId(), "Instantiation of bean failed, can't resolve class", e);
         }
-        ConstructorArgument constructorArgument = bd.getConstructorArgument();
-        Constructor<?>[] candidates = cls.getConstructors();
-        Object args[] = null;
-        Constructor<?> candidateToUse = null;
-        BeanDefinitionValueResolver resolver = new BeanDefinitionValueResolver(factory);
-        TypeConverter converter = new SimpleTypeConverter();
-        for (Constructor<?> candidate : candidates) {
-            if (candidate.getParameterCount() != constructorArgument.getArgumentValuesCount()) {
+
+
+        Constructor<?>[] candidates = beanClass.getConstructors();
+
+
+        BeanDefinitionValueResolver valueResolver =
+                new BeanDefinitionValueResolver(this.beanFactory);
+
+        ConstructorArgument cargs = bd.getConstructorArgument();
+        SimpleTypeConverter typeConverter = new SimpleTypeConverter();
+
+        for(int i=0; i<candidates.length;i++){
+
+            Class<?> [] parameterTypes = candidates[i].getParameterTypes();
+            if(parameterTypes.length != cargs.getArgumentCount()){
                 continue;
             }
-            args = new Object[candidate.getParameterCount()];
-            boolean isMatch = valuesMatchType(args, resolver, converter, candidate.getParameterTypes(), constructorArgument.getArgumentValues());
-            if (isMatch) {
-                candidateToUse = candidate;
+            argsToUse = new Object[parameterTypes.length];
+
+            boolean result = this.valuesMatchTypes(parameterTypes,
+                    cargs.getArgumentValues(),
+                    argsToUse,
+                    valueResolver,
+                    typeConverter);
+
+            if(result){
+                constructorToUse = candidates[i];
+                break;
             }
+
         }
-        if (candidateToUse == null) {
-            throw new BeanCreationException("匹配不到构造器");
+
+
+        //找不到一个合适的构造函数
+        if(constructorToUse == null){
+            throw new BeanCreationException( bd.getId(), "can't find a apporiate constructor");
         }
+
+
         try {
-            return candidateToUse.newInstance(args);
+            return constructorToUse.newInstance(argsToUse);
         } catch (Exception e) {
-            throw new BeanCreationException("匹配构造器实例化失败");
+            e.printStackTrace();
+            throw new BeanCreationException( bd.getId(), "can't find a create instance using "+constructorToUse);
         }
+
+
     }
 
-    private boolean valuesMatchType(Object[] args, BeanDefinitionValueResolver resolver, TypeConverter converter,
-                                    Class<?>[] parameterTypes, List<ConstructorArgument.ValueHolder> argumentValues) {
+    private boolean valuesMatchTypes(Class<?>[] parameterTypes, List<ConstructorArgument.ValueHolder> argumentValues,
+                                     Object[] args, BeanDefinitionValueResolver resolver, TypeConverter converter
+                                    ) {
         for (int i = 0; i < parameterTypes.length; i++) {
             try {
                 Object resolveValue = resolver.resolveValueIfNecessary(argumentValues.get(i).getValue());

@@ -6,5 +6,5 @@ public interface BeanDefinitionRegistry {
 
     BeanDefinition getBeanDefinition(String beanID);
 
-    void registryBeanDefinition(String beanID, BeanDefinition bd);
+    void registerBeanDefinition(String beanID, BeanDefinition bd);
 }

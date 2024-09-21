@@ -1,5 +1,7 @@
 package org.litespring.beans;
 
+import org.litespring.beans.factory.support.GenericBeanDefinition;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,10 @@ public class ConstructorArgument {
         return this.argumentValues;
     }
 
+    public void addArgumentValue(Object value) {
+        this.argumentValues.add(new ValueHolder(value));
+    }
+
     public void addArgumentValue(ValueHolder valueHolder) {
         this.argumentValues.add(valueHolder);
     }
@@ -19,7 +25,7 @@ public class ConstructorArgument {
         return this.argumentValues.size() == 0;
     }
 
-    public int getArgumentValuesCount() {
+    public int getArgumentCount() {
         return this.argumentValues.size();
     }
 

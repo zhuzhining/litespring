@@ -1,5 +1,6 @@
 package org.litespring.context.support;
 
+import org.litespring.beans.factory.NoSuchBeanDefinitionException;
 import org.litespring.core.io.ClassPathResource;
 import org.litespring.core.io.Resource;
 
